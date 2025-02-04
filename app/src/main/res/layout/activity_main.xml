@@ -17,7 +17,7 @@
 
         <ImageButton
             android:id="@+id/imageButtonList"
-            android:layout_width="321dp"
+            android:layout_width="230dp"
             android:layout_height="134dp"
             android:layout_weight="1"
             android:contentDescription="@string/button_to_display_contact_list"
