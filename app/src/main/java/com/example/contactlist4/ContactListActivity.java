@@ -41,29 +41,6 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
         buttonChange();
     }
 
-    private void contactlistButton() {
-        ImageButton imageButtonList = findViewById(R.id.imageButtonList);
-        imageButtonList.setOnClickListener(v -> {
-            Intent intent = new Intent(ContactListActivity.this, ContactListActivity.class);
-            startActivity(intent);
-        });
-    }
-
-    private void mapButton() {
-        ImageButton imageButtonMap = findViewById(R.id.imageButtonMap);
-        imageButtonMap.setOnClickListener(v -> {
-            Intent intent = new Intent(ContactListActivity.this, ContactMapActivity.class);
-            startActivity(intent);
-        });
-    }
-
-    private void settingsButton() {
-        ImageButton imageButtonSettings = findViewById(R.id.imageButtonSettings);
-        imageButtonSettings.setOnClickListener(v -> {
-            Intent intent = new Intent(ContactListActivity.this, ContactSettingsActivity.class);
-            startActivity(intent);
-        });
-    }
 
     private void initToggleButton() {
         ToggleButton toggleButtonEdit = findViewById(R.id.toggleButtonEdit);
@@ -117,6 +94,31 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
             DatePickerDialog dialog = new DatePickerDialog();
             dialog.show(getSupportFragmentManager(), "datePicker");
         });
+
     }
+    private void contactlistButton() {
+        ImageButton imageButtonList = findViewById(R.id.imageButtonList);
+        imageButtonList.setOnClickListener(v -> {
+            Intent intent = new Intent(ContactListActivity.this, ContactListActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void mapButton() {
+        ImageButton imageButtonMap = findViewById(R.id.imageButtonMap);
+        imageButtonMap.setOnClickListener(v -> {
+            Intent intent = new Intent(ContactListActivity.this, ContactMapActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void settingsButton() {
+        ImageButton imageButtonSettings = findViewById(R.id.imageButtonSettings);
+        imageButtonSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(ContactListActivity.this, ContactSettingsActivity.class);
+            startActivity(intent);
+        });
+    }
+
 
 }

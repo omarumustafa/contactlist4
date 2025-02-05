@@ -15,38 +15,38 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme" />
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/navbar_background"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+<!--    <LinearLayout-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@color/navbar_background"-->
+<!--        android:orientation="horizontal"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent">-->
 
-        <ImageButton
-            android:id="@+id/imageButtonList"
-            android:layout_width="321dp"
-            android:layout_height="134dp"
-            android:layout_weight="1"
-            android:contentDescription="@string/button_to_display_contact_list"
-            app:srcCompat="@drawable/contactlist" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/imageButtonList"-->
+<!--            android:layout_width="321dp"-->
+<!--            android:layout_height="134dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:contentDescription="@string/button_to_display_contact_list"-->
+<!--            app:srcCompat="@drawable/contactlist" />-->
 
-        <ImageButton
-            android:id="@+id/imageButtonMap"
-            android:layout_width="wrap_content"
-            android:layout_height="134dp"
-            android:layout_weight="1"
-            android:contentDescription="@string/button_to_display_map"
-            app:srcCompat="@drawable/mapicon" />
+<!--        <ImageButton-->
+<!--            android:id="@+id/imageButtonMap"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="134dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:contentDescription="@string/button_to_display_map"-->
+<!--            app:srcCompat="@drawable/mapicon" />-->
 
-        <ImageButton
-            android:id="@+id/imageButtonSettings"
-            android:layout_width="wrap_content"
-            android:layout_height="131dp"
-            android:layout_weight="1"
-            android:contentDescription="@string/button_to_display_settings"
-            app:srcCompat="@drawable/settingsicon" />
-    </LinearLayout>
+<!--        <ImageButton-->
+<!--            android:id="@+id/imageButtonSettings"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="131dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:contentDescription="@string/button_to_display_settings"-->
+<!--            app:srcCompat="@drawable/settingsicon" />-->
+<!--    </LinearLayout>-->
 
     <ToggleButton
         android:id="@+id/toggleButtonEdit"
@@ -244,6 +244,38 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/navbar_background"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/imageButtonList"
+            android:layout_width="321dp"
+            android:layout_height="134dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/button_to_display_contact_list"
+            app:srcCompat="@drawable/contactlist" />
+
+        <ImageButton
+            android:id="@+id/imageButtonMap"
+            android:layout_width="wrap_content"
+            android:layout_height="134dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/button_to_display_map"
+            app:srcCompat="@drawable/mapicon" />
+
+        <ImageButton
+            android:id="@+id/imageButtonSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="131dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/button_to_display_settings"
+            app:srcCompat="@drawable/settingsicon" />
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
