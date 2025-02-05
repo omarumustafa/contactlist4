@@ -7,6 +7,15 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ListView
+        android:id="@+id/listViewContacts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-143dp" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -39,4 +48,5 @@
             android:contentDescription="@string/button_to_display_settings"
             app:srcCompat="@drawable/settingsicon" />
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

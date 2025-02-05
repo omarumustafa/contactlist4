@@ -7,11 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 
 import android.database.SQLException;
 
+import java.util.ArrayList;
+
 
 public class ContactDataSource {
 
     private SQLiteDatabase database;
-    private ContactDBHelper dbHelper;
+    private final ContactDBHelper dbHelper;
 
     public ContactDataSource(Context context) {
         dbHelper = new ContactDBHelper(context);
@@ -87,5 +89,23 @@ public class ContactDataSource {
     }
 
 
+    public ArrayList<Contact> getAllContacts() {
+        ArrayList<Contact> contacts = new ArrayList<>();
+        try {
+            String query = "SELECT * FROM contact ORDER BY contactname";
+            Cursor cursor = database.rawQuery(query, null);
+
+            while (cursor.moveToNext()) {
+                Contact contact = new Contact();
+                contact.setContactID(cursor.getInt(0));
+                contact.setContactName(cursor.getString(1));
+                contacts.add(contact);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            contacts = new ArrayList<>();
+        }
+        return contacts;
+    }
 }
 

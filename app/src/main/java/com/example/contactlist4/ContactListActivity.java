@@ -6,9 +6,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -170,8 +173,33 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
             s.fullScroll(ScrollView.FOCUS_UP); // Move focus to the top of the ScrollView
         }
     }
+    private void updateListView() {
+        ListView listView = findViewById(R.id.listViewContacts); // Ensure this ID exists in XML
+        ContactDataSource ds = new ContactDataSource(this);
 
-        private void initSaveButton() {
+        try {
+            ds.open();
+            ArrayList<Contact> contacts = ds.getAllContacts();
+            ds.close();
+
+            // Extract contact names for display
+            ArrayList<String> contactNames = new ArrayList<>();
+            for (Contact contact : contacts) {
+                contactNames.add(contact.getContactName()); // Only adding names to the list
+            }
+
+            // Set up the ListView Adapter
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    this, android.R.layout.simple_list_item_1, contactNames);
+            listView.setAdapter(adapter);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void initSaveButton() {
         Button saveButton = findViewById(R.id.buttonSave);
         saveButton.setOnClickListener(new View.OnClickListener() {
 
@@ -207,6 +235,7 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
                     ToggleButton editToggle = findViewById(R.id.toggleButtonEdit);
                     editToggle.toggle();
                     setForEditing(false);
+                    updateListView();
                 }
             }
         });

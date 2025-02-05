@@ -2,9 +2,11 @@ package com.example.contactlist4;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
@@ -13,9 +15,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
 
-    private Contact currentContact;
+public class MainActivity extends AppCompatActivity {
+    private ListView listView;
+    private ContactDataSource dataSource;
+    private ArrayList<String> contactNames;
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +40,35 @@ public class MainActivity extends AppCompatActivity {
         contactlistButton();
         mapButton();
         settingsButton();
-        currentContact = new Contact();
+        listView = findViewById(R.id.listViewContacts);
+        dataSource = new ContactDataSource(this);
+        dataSource.open();
+
+        contactNames = getContactNames(); // Retrieve all contact names
+        displayContacts(); // Display in ListView
 
 
+
+    }
+    private ArrayList<String> getContactNames() {
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Contact> contacts = dataSource.getAllContacts(); // Retrieve all contacts
+        for (Contact c : contacts) {
+            names.add(c.getContactName()); // Add only names
+        }
+        return names;
+    }
+
+    private void displayContacts() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1, contactNames);
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        dataSource.close(); // Close DB when activity is destroyed
+        super.onDestroy();
     }
 
     private void contactlistButton() {
