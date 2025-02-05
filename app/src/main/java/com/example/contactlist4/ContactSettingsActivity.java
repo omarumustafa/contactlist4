@@ -1,6 +1,8 @@
 package com.example.contactlist4;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,31 @@ public class ContactSettingsActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+        contactlistButton();
+        mapButton();
+        settingsButton();
+    }
+    private void contactlistButton() {
+        ImageButton imageButtonList = findViewById(R.id.imageButtonList);
+        imageButtonList.setOnClickListener(v -> {
+            Intent intent = new Intent(ContactSettingsActivity.this, ContactListActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void mapButton() {
+        ImageButton imageButtonMap = findViewById(R.id.imageButtonMap);
+        imageButtonMap.setOnClickListener(v -> {
+            Intent intent = new Intent(ContactSettingsActivity.this, ContactMapActivity.class);
+            startActivity(intent);
+        });
+    }
+    private void settingsButton() {
+        ImageButton imageButtonSettings = findViewById(R.id.imageButtonSettings);
+        imageButtonSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(ContactSettingsActivity.this, ContactSettingsActivity.class);
+            startActivity(intent);
         });
     }
 }
