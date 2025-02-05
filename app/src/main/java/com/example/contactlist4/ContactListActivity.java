@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
@@ -13,8 +15,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class ContactListActivity extends AppCompatActivity {
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
+public class ContactListActivity extends AppCompatActivity implements DatePickerDialog.SaveDateListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,12 +30,15 @@ public class ContactListActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         contactlistButton();
         mapButton();
         settingsButton();
+
         initToggleButton();
 
         setForEditing(false);
+        buttonChange();
     }
 
     private void contactlistButton() {
@@ -48,6 +56,7 @@ public class ContactListActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
     private void settingsButton() {
         ImageButton imageButtonSettings = findViewById(R.id.imageButtonSettings);
         imageButtonSettings.setOnClickListener(v -> {
@@ -55,6 +64,7 @@ public class ContactListActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
     private void initToggleButton() {
         ToggleButton toggleButtonEdit = findViewById(R.id.toggleButtonEdit);
         toggleButtonEdit.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -90,4 +100,23 @@ public class ContactListActivity extends AppCompatActivity {
 
 
     }
+    @Override
+    public void didFinishDatePickerDialog(Calendar selectedTime) {
+        // Handle the selected date here (e.g., update UI, save to a database, etc.)
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        String formattedDate = sdf.format(selectedTime.getTime());
+
+        Toast.makeText(this, "Selected Date: " + formattedDate, Toast.LENGTH_SHORT).show();
+        TextView textBirthday = findViewById(R.id.textBirthday);
+        textBirthday.setText("Birthday: " + formattedDate);
+    }
+
+    private void buttonChange() {
+        Button buttonChange = findViewById(R.id.buttonChange);
+        buttonChange.setOnClickListener(v -> {
+            DatePickerDialog dialog = new DatePickerDialog();
+            dialog.show(getSupportFragmentManager(), "datePicker");
+        });
+    }
+
 }
