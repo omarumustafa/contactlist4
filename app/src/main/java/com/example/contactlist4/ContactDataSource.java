@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import android.database.SQLException;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,7 @@ public class ContactDataSource {
             didSucceed = database.insert("contact", null, initialValues) > 0;
         }
         catch (Exception e) {
-            // Do nothing - will return false if there is an exception
+            Log.e("DB_ERROR", "Error inserting contact", e);
         }
         return didSucceed;
     }
@@ -87,25 +88,47 @@ public class ContactDataSource {
         }
         return lastId;
     }
-
-
-    public ArrayList<Contact> getAllContacts() {
-        ArrayList<Contact> contacts = new ArrayList<>();
-        try {
-            String query = "SELECT * FROM contact ORDER BY contactname";
+    public ArrayList<String> getContactName(){
+        ArrayList<String> contactNames = new ArrayList<>();
+        try{
+            String query = "SELECT contactname FROM contact ORDER BY contactname";
             Cursor cursor = database.rawQuery(query, null);
 
-            while (cursor.moveToNext()) {
-                Contact contact = new Contact();
-                contact.setContactID(cursor.getInt(0));
-                contact.setContactName(cursor.getString(1));
-                contacts.add(contact);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                String contactName = cursor.getString(0);
+                contactNames.add(contactName);
+                cursor.moveToNext();
             }
             cursor.close();
-        } catch (Exception e) {
-            contacts = new ArrayList<>();
         }
-        return contacts;
+        catch (Exception e) {
+            contactNames = new ArrayList<String>();
+            }
+        return contactNames;
+
+
+        }
     }
-}
+
+
+//    public ArrayList<Contact> getAllContacts() {
+//        ArrayList<Contact> contacts = new ArrayList<>();
+//        try {
+//            String query = "SELECT * FROM contact ORDER BY contactname";
+//            Cursor cursor = database.rawQuery(query, null);
+//
+//            while (cursor.moveToNext()) {
+//                Contact contact = new Contact();
+//                contact.setContactID(cursor.getInt(0));
+//                contact.setContactName(cursor.getString(1));
+//                contacts.add(contact);
+//            }
+//            cursor.close();
+//        } catch (Exception e) {
+//            contacts = new ArrayList<>();
+//        }
+//        return contacts;
+//    }
+
 

@@ -2,11 +2,13 @@ package com.example.contactlist4;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
@@ -14,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -40,30 +44,52 @@ public class MainActivity extends AppCompatActivity {
         contactlistButton();
         mapButton();
         settingsButton();
-        listView = findViewById(R.id.listViewContacts);
-        dataSource = new ContactDataSource(this);
-        dataSource.open();
+//        listView = findViewById(R.id.listViewContacts);
+//        dataSource = new ContactDataSource(this);
+//        dataSource.open();
+//
+//        contactNames = getContactNames(); // Retrieve all contact names
+//        displayContacts(); // Display in ListView
 
-        contactNames = getContactNames(); // Retrieve all contact names
-        displayContacts(); // Display in ListView
+        ContactDataSource ds = new ContactDataSource(this);
+        ArrayList<String> names;
+        try {
+            ds.open();
+            names = ds.getContactName();
+            ds.close();
 
+            Log.d("DB_CHECK", "Number of Contacts: " + names.size());
+            for (String name : names) {
+                Log.d("DB_CHECK", "Contact: " + name);
+            }
 
-
-    }
-    private ArrayList<String> getContactNames() {
-        ArrayList<String> names = new ArrayList<>();
-        ArrayList<Contact> contacts = dataSource.getAllContacts(); // Retrieve all contacts
-        for (Contact c : contacts) {
-            names.add(c.getContactName()); // Add only names
+            RecyclerView contactList = findViewById(R.id.rvContacts);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            contactList.setLayoutManager(layoutManager);
+            ContactAdapter contactAdapter = new ContactAdapter(names);
+            contactList.setAdapter(contactAdapter);
         }
-        return names;
-    }
+        catch (Exception e){
+            Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
+        }
 
-    private void displayContacts() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1, contactNames);
-        listView.setAdapter(adapter);
+
+
     }
+//    private ArrayList<String> getContactNames() {
+//        ArrayList<String> names = new ArrayList<>();
+//        ArrayList<Contact> contacts = dataSource.getAllContacts(); // Retrieve all contacts
+//        for (Contact c : contacts) {
+//            names.add(c.getContactName()); // Add only names
+//        }
+//        return names;
+//    }
+
+//    private void displayContacts() {
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+//                this, android.R.layout.simple_list_item_1, contactNames);
+//        listView.setAdapter(adapter);
+//    }
 
     @Override
     protected void onDestroy() {

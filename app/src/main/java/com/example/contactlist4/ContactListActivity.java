@@ -21,6 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,12 +53,29 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
         buttonChange();
         initTextChangedEvents();
         initSaveButton();
+//        buttonSave();
 
         currentContact = new Contact();
 
+//        ContactDataSource ds = new ContactDataSource(this);
+//        ArrayList<String> names;
+//        try {
+//            ds.open();
+//            names = ds.getContactName();
+//            ds.close();
+//            RecyclerView contactList = findViewById(R.id.rvContacts);
+//            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+//            contactList.setLayoutManager(layoutManager);
+//            ContactAdapter contactAdapter = new ContactAdapter(names);
+//            contactList.setAdapter(contactAdapter);
+//        }
+//        catch (Exception e){
+//            Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
+//        }
 
 
     }
+
 
 
     private void initToggleButton() {
@@ -173,30 +192,30 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
             s.fullScroll(ScrollView.FOCUS_UP); // Move focus to the top of the ScrollView
         }
     }
-    private void updateListView() {
-        ListView listView = findViewById(R.id.listViewContacts); // Ensure this ID exists in XML
-        ContactDataSource ds = new ContactDataSource(this);
-
-        try {
-            ds.open();
-            ArrayList<Contact> contacts = ds.getAllContacts();
-            ds.close();
-
-            // Extract contact names for display
-            ArrayList<String> contactNames = new ArrayList<>();
-            for (Contact contact : contacts) {
-                contactNames.add(contact.getContactName()); // Only adding names to the list
-            }
-
-            // Set up the ListView Adapter
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    this, android.R.layout.simple_list_item_1, contactNames);
-            listView.setAdapter(adapter);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    private void updateListView() {
+//        ListView listView = findViewById(R.id.listViewContacts); // Ensure this ID exists in XML
+//        ContactDataSource ds = new ContactDataSource(this);
+//
+//        try {
+//            ds.open();
+//            ArrayList<String> contacts = ds.getContactName();
+//            ds.close();
+//
+//            // Extract contact names for display
+//            ArrayList<String> contactNames = new ArrayList<>();
+//            for (String contact : contacts) {
+//                contactNames.add(contact.getContactName()); // Only adding names to the list
+//            }
+//
+//            // Set up the ListView Adapter
+//            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+//                    this, android.R.layout.simple_list_item_1, contactNames);
+//            listView.setAdapter(adapter);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     private void initSaveButton() {
@@ -235,7 +254,7 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
                     ToggleButton editToggle = findViewById(R.id.toggleButtonEdit);
                     editToggle.toggle();
                     setForEditing(false);
-                    updateListView();
+//                    updateListView();
                 }
             }
         });
@@ -253,6 +272,15 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
 
         currentContact.setBirthday(selectedTime);
     }
+//    private void buttonSave() {
+//        Button buttonSaveClk = findViewById(R.id.buttonSave);
+//        buttonSaveClk.setOnClickListener(v -> {
+//            Intent intent = new Intent(ContactListActivity.this, ContactSettingsActivity.class);
+//            startActivity(intent);
+//        });
+//
+
+
 
     private void buttonChange() {
         Button buttonChange = findViewById(R.id.buttonChange);
