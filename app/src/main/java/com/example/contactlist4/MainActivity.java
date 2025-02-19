@@ -52,29 +52,35 @@ public class MainActivity extends AppCompatActivity {
 //        displayContacts(); // Display in ListView
 
         ContactDataSource ds = new ContactDataSource(this);
-        ArrayList<String> names;
+        ArrayList<Contact> contacts;
+
         try {
             ds.open();
-            names = ds.getContactName();
+            contacts = ds.getContacts();
+
+            ds.getContacts();
             ds.close();
 
-            Log.d("DB_CHECK", "Number of Contacts: " + names.size());
-            for (String name : names) {
-                Log.d("DB_CHECK", "Contact: " + name);
+            Log.d("DB_CHECK", "Number of Contacts: " + contacts.size());
+            for (Contact c : contacts) {
+                Log.d("DB_CHECK", "Contact: " + contacts);
             }
 
             RecyclerView contactList = findViewById(R.id.rvContacts);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             contactList.setLayoutManager(layoutManager);
-            ContactAdapter contactAdapter = new ContactAdapter(names);
+
+            ContactAdapter contactAdapter = new ContactAdapter(contacts, contact -> {
+                Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
+                intent.putExtra("contact_name", contacts);
+                intent.putExtra("contact_phone", contacts);
+                startActivity(intent);
+            });
+
             contactList.setAdapter(contactAdapter);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
         }
-
-
-
     }
 //    private ArrayList<String> getContactNames() {
 //        ArrayList<String> names = new ArrayList<>();
