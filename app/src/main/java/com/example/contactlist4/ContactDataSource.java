@@ -90,31 +90,6 @@ public class ContactDataSource {
         return lastId;
     }
 
-    public ArrayList<String> getContactName() {
-        ArrayList<String> contacts = new ArrayList<>();
-        try {
-            String query = "SELECT contactname FROM contact";  // s
-            Cursor cursor = database.rawQuery(query, null);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    String name = cursor.getString(0);
-                    String phone = cursor.getString(6);
-                    contacts.add(Arrays.toString(new String[]{name, phone}));
-//                    contactNames.add(cursor.getString(0));//
-//                    contactPhones.add(cursor.getString(6));
-                    Log.d("DB_CHECK", "Retrieved Contact Name: " + name);
-                    Log.d("DB_CHECK", "Retrieved Contact Phone: " + phone);
-
-                } while (cursor.moveToNext());  //
-            }
-            cursor.close();
-        } catch (Exception e) {
-            contacts = new ArrayList<>();
-        }
-        return contacts;
-
-    }
 
     public ArrayList<Contact> getContacts() {
         ArrayList<Contact> contacts = new ArrayList<>();
@@ -167,6 +142,17 @@ public class ContactDataSource {
         }
         return contacts;
     }
+    public boolean deleteContact(int contactId) {
+        boolean didDelete = false;
+        try {
+            didDelete = database.delete("contact", "_id=" + contactId, null) > 0;
+        }
+        catch (Exception e) {
+            // Do nothing - return value already set to false
+        }
+        return didDelete;
+    }
+
 
     public Contact getSpecificContact(int contactId) {
         Contact contact = new Contact();
@@ -195,23 +181,5 @@ public class ContactDataSource {
 }
 
 
-//    public ArrayList<Contact> getAllContacts() {
-//        ArrayList<Contact> contacts = new ArrayList<>();
-//        try {
-//            String query = "SELECT * FROM contact ORDER BY contactname";
-//            Cursor cursor = database.rawQuery(query, null);
-//
-//            while (cursor.moveToNext()) {
-//                Contact contact = new Contact();
-//                contact.setContactID(cursor.getInt(0));
-//                contact.setContactName(cursor.getString(1));
-//                contacts.add(contact);
-//            }
-//            cursor.close();
-//        } catch (Exception e) {
-//            contacts = new ArrayList<>();
-//        }
-//        return contacts;
-//    }
 
 

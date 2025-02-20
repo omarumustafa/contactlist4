@@ -1,9 +1,11 @@
 package com.example.contactlist4;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -46,35 +48,70 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
         contactlistButton();
         mapButton();
         settingsButton();
-
         initToggleButton();
+
+        int contactId = getIntent().getIntExtra("contact_id", -1);
+        if (contactId == -1) {
+            Log.e("ContactListActivity", "Error: No contact ID received");
+        } else {
+            Log.d("ContactListActivity", "Opening contact ID: " + contactId);
+        }
+
+        if (contactId != -1) {
+            initContact(contactId);
+        } else {
+            currentContact = new Contact();
+        }
+
+
 
         setForEditing(false);
         buttonChange();
         initTextChangedEvents();
         initSaveButton();
-//        buttonSave();
 
-        currentContact = new Contact();
 
-//        ContactDataSource ds = new ContactDataSource(this);
-//        ArrayList<String> names;
-//        try {
-//            ds.open();
-//            names = ds.getContactName();
-//            ds.close();
-//            RecyclerView contactList = findViewById(R.id.rvContacts);
-//            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-//            contactList.setLayoutManager(layoutManager);
-//            ContactAdapter contactAdapter = new ContactAdapter(names);
-//            contactList.setAdapter(contactAdapter);
-//        }
-//        catch (Exception e){
-//            Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
-//        }
+
+//
+
+
 
 
     }
+    private void initContact(int id) {
+        ContactDataSource ds = new ContactDataSource(ContactListActivity.this);
+        try {
+            ds.open();
+            currentContact = ds.getSpecificContact(id);
+            ds.close();
+        }
+        catch (Exception e) {
+            Toast.makeText(this, "Load Contact Failed", Toast.LENGTH_LONG).show();
+        }
+
+        EditText editName = findViewById(R.id.editTextName);
+        EditText editAddress = findViewById(R.id.editTextStreet);
+        EditText editCity = findViewById(R.id.editTextCity);
+        EditText editState = findViewById(R.id.editTextState);
+        EditText editZipCode = findViewById(R.id.editTextZip);
+        EditText editPhone = findViewById(R.id.editTextHomePhone);
+        EditText editCell = findViewById(R.id.editTextCellPhone);
+        EditText editEmail = findViewById(R.id.editTextEmail);
+        TextView birthDay = findViewById(R.id.textBirthday);
+
+        editName.setText(currentContact.getContactName());
+        editAddress.setText(currentContact.getStreetAddress());
+        editCity.setText(currentContact.getCity());
+        editState.setText(currentContact.getState());
+        editZipCode.setText(currentContact.getZipCode());
+
+        editPhone.setText(currentContact.getPhoneNumber());
+        editCell.setText(currentContact.getCellNumber());
+        editEmail.setText(currentContact.getEMail());
+        birthDay.setText(DateFormat.format("MM/dd/yyyy", currentContact.getBirthday().getTimeInMillis()).toString());
+    }
+
+
 
 
 
