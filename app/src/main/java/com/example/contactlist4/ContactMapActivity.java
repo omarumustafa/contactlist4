@@ -34,6 +34,8 @@ public class ContactMapActivity extends AppCompatActivity {
     LocationManager locationManager;
 
     LocationListener gpsListener;
+    LocationListener networkListener;
+    Location currentBestLocation;
 
     final int PERMISSION_REQUEST_LOCATION = 101;
 
@@ -44,7 +46,7 @@ public class ContactMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_contact_map);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_contact_map), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -57,6 +59,9 @@ public class ContactMapActivity extends AppCompatActivity {
         settingsButton();
         initGetLocationButton();
         startLocationUpdates();
+
+
+
 
     }
     private void initGetLocationButton() {
@@ -113,13 +118,38 @@ public class ContactMapActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(getBaseContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getBaseContext(),
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
         try {
             locationManager.removeUpdates(gpsListener);
+            locationManager.removeUpdates(networkListener);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
+    private boolean isBetterLocation(Location location) {
+        boolean isBetter = false;
+        if (currentBestLocation == null) {
+            isBetter = true;
+        }
+        else if (location.getAccuracy() <= currentBestLocation.getAccuracy()) {
+            isBetter = true;
+        }
+        else if (location.getTime() - currentBestLocation.getTime() > 5 * 60 * 1000) {
+            isBetter = true;
+        }
+        return isBetter;
+    }
+
     private void startLocationUpdates() {
         if ( Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(getBaseContext(),
@@ -136,6 +166,9 @@ public class ContactMapActivity extends AppCompatActivity {
 
             gpsListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
+                    if (isBetterLocation(location)) {
+                        currentBestLocation = location;//display in location in TextViews.
+                    }//no else block.if not better, just ig
                     TextView txtLatitude = (TextView) findViewById(R.id.txtLatitude);
                     TextView txtLongitude = (TextView) findViewById(R.id.txtLongitude);
                     TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
@@ -149,10 +182,27 @@ public class ContactMapActivity extends AppCompatActivity {
                 public void onProviderEnabled(String provider) {}
                 public void onProviderDisabled(String provider) {}
             };
-
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 0, 0, gpsListener
             );
+            networkListener = new LocationListener() {
+                public void onLocationChanged(Location location) {
+                    TextView txtLatitude = (TextView) findViewById(R.id.txtLatitude);
+                    TextView txtLongitude = (TextView) findViewById(R.id.txtLongitude);
+                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
+
+                    txtLatitude.setText(String.valueOf(location.getLatitude()));
+                    txtLongitude.setText(String.valueOf(location.getLongitude()));
+                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+                }
+
+                public void onStatusChanged(String provider, int status, Bundle extras) {}
+                public void onProviderEnabled(String provider) {}
+                public void onProviderDisabled(String provider) {}
+            };
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0, 0, networkListener);
+
+
         }
         catch (Exception e) {
             Toast.makeText(getBaseContext(), "Error, Location not available", Toast.LENGTH_LONG).show();
