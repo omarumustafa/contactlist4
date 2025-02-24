@@ -1,5 +1,6 @@
 package com.example.contactlist4;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -49,58 +50,84 @@ public class MainActivity extends AppCompatActivity {
 //        initDeleteButton();
 
 
-        ContactDataSource ds = new ContactDataSource(this);
-        ArrayList<Contact> contacts;
-
-        try {
-            ds.open();
-            contacts = ds.getContacts();
-
-            ds.getContacts();
-            ds.close();
-
-            Log.d("DB_CHECK", "Number of Contacts: " + contacts.size());
-            for (Contact c : contacts) {
-                Log.d("DB_CHECK", "Contact: " + contacts);
-            }
-
-            RecyclerView contactList = findViewById(R.id.rvContacts);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-            contactList.setLayoutManager(layoutManager);
-
-            contactAdapter = new ContactAdapter(this, contacts, contact -> {
-                Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
-//                intent.putExtra("contact_name", contacts);
-//                intent.putExtra("contact_phone", contacts);
-//                intent.putExtra("contact_email", contacts);
-//                intent.putExtra("contact_address", contacts);
-//                intent.putExtra("contact_city", contacts);
-//                intent.putExtra("contact_state", contacts);
-//                intent.putExtra("contact_zip", contacts);
-//                intent.putExtra("contact_birthday", contacts);
-                intent.putExtra("contact_id", contact.getContactID());
-                startActivity(intent);
-            });
-
-            contactList.setAdapter(contactAdapter);
-        } catch (Exception e) {
-            Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
-        }
-    }
-//    private ArrayList<String> getContactNames() {
-//        ArrayList<String> names = new ArrayList<>();
-//        ArrayList<Contact> contacts = dataSource.getAllContacts(); // Retrieve all contacts
-//        for (Contact c : contacts) {
-//            names.add(c.getContactName()); // Add only names
+//        ContactDataSource ds = new ContactDataSource(this);
+//        ArrayList<Contact> contacts;
+//
+//        try {
+//            ds.open();
+//            contacts = ds.getContacts();
+//
+//            ds.getContacts();
+//            ds.close();
+//
+//            Log.d("DB_CHECK", "Number of Contacts: " + contacts.size());
+//            for (Contact c : contacts) {
+//                Log.d("DB_CHECK", "Contact: " + contacts);
+//            }
+//
+//            RecyclerView contactList = findViewById(R.id.rvContacts);
+//            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+//            contactList.setLayoutManager(layoutManager);
+//
+//            contactAdapter = new ContactAdapter(this, contacts, contact -> {
+//                Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
+////                intent.putExtra("contact_name", contacts);
+////                intent.putExtra("contact_phone", contacts);
+////                intent.putExtra("contact_email", contacts);
+////                intent.putExtra("contact_address", contacts);
+////                intent.putExtra("contact_city", contacts);
+////                intent.putExtra("contact_state", contacts);
+////                intent.putExtra("contact_zip", contacts);
+////                intent.putExtra("contact_birthday", contacts);
+//                intent.putExtra("contact_id", contact.getContactID());
+//                startActivity(intent);
+//            });
+//
+//            contactList.setAdapter(contactAdapter);
+//        } catch (Exception e) {
+//            Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
 //        }
-//        return names;
-//    }
+    }
+@Override
+public void onResume() {
+        super.onResume();
+    String sortBy = getSharedPreferences("MyContactListPreferences",
 
-//    private void displayContacts() {
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-//                this, android.R.layout.simple_list_item_1, contactNames);
-//        listView.setAdapter(adapter);
-//    }
+            Context.MODE_PRIVATE).getString("sortfield", "contactname");
+
+    String sortOrder = getSharedPreferences("MyContactListPreferences",
+
+            Context.MODE_PRIVATE).getString("sortorder", "ASC");
+    ContactDataSource ds = new ContactDataSource(this);
+    ArrayList<Contact> contacts;
+
+    try {
+        ds.open();
+        contacts = ds.getContacts(sortBy, sortOrder);
+
+        ds.getContacts(sortBy, sortOrder);
+        ds.close();
+
+        Log.d("DB_CHECK", "Number of Contacts: " + contacts.size());
+        for (Contact c : contacts) {
+            Log.d("DB_CHECK", "Contact: " + contacts);
+        }
+
+        RecyclerView contactList = findViewById(R.id.rvContacts);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        contactList.setLayoutManager(layoutManager);
+
+        contactAdapter = new ContactAdapter(this, contacts, contact -> {
+            Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
+            intent.putExtra("contact_id", contact.getContactID());
+            startActivity(intent);
+        });
+
+        contactList.setAdapter(contactAdapter);
+    } catch (Exception e) {
+        Toast.makeText(this, "Error retrieving contact", Toast.LENGTH_SHORT).show();
+    }
+}
 
     @Override
     protected void onDestroy() {
@@ -130,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     private void contactlistButton() {
         ImageButton imageButtonList = findViewById(R.id.imageButtonList);
         imageButtonList.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ContactListActivity.class);
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
             startActivity(intent);
         });
     }

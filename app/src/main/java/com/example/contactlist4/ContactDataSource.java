@@ -91,7 +91,7 @@ public class ContactDataSource {
     }
 
 
-    public ArrayList<Contact> getContacts() {
+    public ArrayList<Contact> getContacts(String sortField, String sortOrder) {
         ArrayList<Contact> contacts = new ArrayList<>();
         try {
             String query = "SELECT * FROM contact";

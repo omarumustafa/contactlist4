@@ -1,6 +1,7 @@
 package com.example.contactlist4;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -33,6 +34,11 @@ import java.util.Locale;
 
 public class ContactListActivity extends AppCompatActivity implements DatePickerDialog.SaveDateListener {
     private Contact currentContact;
+    private ArrayList<Contact> contacts;
+    private ArrayList<String> names;
+    private ListView listView;
+    private ContactAdapter contactAdapter;
+    private RecyclerView contactList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +84,28 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
 
 
     }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        String sortBy = getSharedPreferences("MyContactListPreferences",
+//                Context.MODE_PRIVATE).getString("sortfield", "contactname");
+//        String sortOrder = getSharedPreferences("MyContactListPreferences",
+//                Context.MODE_PRIVATE).getString("sortorder", "ASC");
+//        ContactDataSource ds = new ContactDataSource(this);
+//        try {
+//            ds.open();
+//            contacts = ds.getContacts(sortBy, sortOrder);
+//            ds.close();
+//            contactList = findViewById(R.id.rvContacts);
+//            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+//            contactList.setLayoutManager(layoutManager);
+//            contactAdapter = new ContactAdapter(this, contacts);
+//            contactList.setAdapter(contactAdapter);
+//        } catch (Exception e) {
+//            Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
+//        }
+//    }
+
     private void initContact(int id) {
         ContactDataSource ds = new ContactDataSource(ContactListActivity.this);
         try {
@@ -229,31 +257,6 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
             s.fullScroll(ScrollView.FOCUS_UP); // Move focus to the top of the ScrollView
         }
     }
-//    private void updateListView() {
-//        ListView listView = findViewById(R.id.listViewContacts); // Ensure this ID exists in XML
-//        ContactDataSource ds = new ContactDataSource(this);
-//
-//        try {
-//            ds.open();
-//            ArrayList<String> contacts = ds.getContactName();
-//            ds.close();
-//
-//            // Extract contact names for display
-//            ArrayList<String> contactNames = new ArrayList<>();
-//            for (String contact : contacts) {
-//                contactNames.add(contact.getContactName()); // Only adding names to the list
-//            }
-//
-//            // Set up the ListView Adapter
-//            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-//                    this, android.R.layout.simple_list_item_1, contactNames);
-//            listView.setAdapter(adapter);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 
     private void initSaveButton() {
         Button saveButton = findViewById(R.id.buttonSave);
@@ -330,7 +333,7 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
     private void contactlistButton() {
         ImageButton imageButtonList = findViewById(R.id.imageButtonList);
         imageButtonList.setOnClickListener(v -> {
-            Intent intent = new Intent(ContactListActivity.this, ContactListActivity.class);
+            Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
             startActivity(intent);
         });
     }
