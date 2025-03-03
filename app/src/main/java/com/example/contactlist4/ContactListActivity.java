@@ -3,6 +3,10 @@ package com.example.contactlist4;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,12 +24,17 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +48,11 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
     private ListView listView;
     private ContactAdapter contactAdapter;
     private RecyclerView contactList;
+
+    final int PERMISSION_REQUEST_PHONE = 1;
+    final int PERMISSION_REQUEST_CAMERA = 103;
+    final int CAMERA_REQUEST = 1888;
+//    private Bitmap picture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,41 +84,172 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
         }
 
 
-
         setForEditing(false);
         buttonChange();
         initTextChangedEvents();
         initSaveButton();
+        initCallFunction();
+        initImageButton();
+
 
 
 
 //
 
 
-
-
     }
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        String sortBy = getSharedPreferences("MyContactListPreferences",
-//                Context.MODE_PRIVATE).getString("sortfield", "contactname");
-//        String sortOrder = getSharedPreferences("MyContactListPreferences",
-//                Context.MODE_PRIVATE).getString("sortorder", "ASC");
-//        ContactDataSource ds = new ContactDataSource(this);
-//        try {
-//            ds.open();
-//            contacts = ds.getContacts(sortBy, sortOrder);
-//            ds.close();
-//            contactList = findViewById(R.id.rvContacts);
-//            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-//            contactList.setLayoutManager(layoutManager);
-//            contactAdapter = new ContactAdapter(this, contacts);
-//            contactList.setAdapter(contactAdapter);
-//        } catch (Exception e) {
-//            Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
-//        }
-//    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_PHONE: {
+                if (grantResults.length > 0 && grantResults[0] ==
+                        PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(ContactListActivity.this, "You may now call from this app.",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ContactListActivity.this, "You will not be able to make calls " +
+                            "from this app", Toast.LENGTH_LONG).show();
+                }
+            }
+            case PERMISSION_REQUEST_CAMERA: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    takePhoto();
+                } else {
+                    Toast.makeText(ContactListActivity.this,
+                            "You will not be able to save contact pictures from this app",
+                            Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+
+        }
+    }
+    public void takePhoto() {
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                Bitmap scaledPhoto = Bitmap.createScaledBitmap(photo, 144, 144, true);
+                ImageButton imageContact = (ImageButton) findViewById(R.id.imageContact);
+                imageContact.setImageBitmap(scaledPhoto);
+                currentContact.setPicture(scaledPhoto);
+            }
+        }
+    }
+
+
+
+
+    private void initImageButton() {
+        ImageButton ib = findViewById(R.id.imageContact);
+        ib.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ContextCompat.checkSelfPermission(ContactListActivity.this,
+                            android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                        if (ActivityCompat.shouldShowRequestPermissionRationale
+                                (ContactListActivity.this, android.Manifest.permission.CAMERA)) {
+
+                            Snackbar.make(findViewById(R.id.activity_main),
+                                            "The app needs permission to take pictures.",
+                                            Snackbar.LENGTH_INDEFINITE)
+                                    .setAction("OK", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            ActivityCompat.requestPermissions(
+                                                    ContactListActivity.this,
+                                                    new String[]{android.Manifest.permission.CAMERA},
+                                                    PERMISSION_REQUEST_CAMERA);
+                                        }
+                                    })
+                                    .show();
+                        } else {
+                            ActivityCompat.requestPermissions(
+                                    ContactListActivity.this,
+                                    new String[]{android.Manifest.permission.CAMERA},
+                                    PERMISSION_REQUEST_CAMERA);
+                        }
+                    } else {
+                        takePhoto();
+                    }
+                } else {
+                    takePhoto();
+                }
+            }
+        });
+    }
+
+
+    private void checkPhonePermission(String phoneNumber) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ContextCompat.checkSelfPermission(ContactListActivity.this,
+                    android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(ContactListActivity.this,
+                        android.Manifest.permission.CALL_PHONE)) {
+
+                    Snackbar.make(findViewById(R.id.activity_main),
+                            "MyContactList requires this permission to place a call from the app.",
+                            Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(
+                                    ContactListActivity.this,
+                                    new String[]{android.Manifest.permission.CALL_PHONE},
+                                    PERMISSION_REQUEST_PHONE);
+                        }
+                    }).show();
+
+                } else {
+                    ActivityCompat.requestPermissions(ContactListActivity.this,
+                            new String[]{android.Manifest.permission.CALL_PHONE},
+                            PERMISSION_REQUEST_PHONE);
+                }
+            } else {
+                callContact(phoneNumber);
+            }
+        } else {
+            callContact(phoneNumber);
+        }
+    }
+
+    private void initCallFunction() {
+        EditText editPhone = (EditText) findViewById(R.id.editTextHomePhone);
+        editPhone.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View arg0) {
+                checkPhonePermission(currentContact.getPhoneNumber());
+                return false;
+            }
+        });
+    }
+    private void callContact(String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(getBaseContext(),
+                        android.Manifest.permission.CALL_PHONE) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            return;
+        } else {
+            startActivity(intent);
+        }
+    }
+
+
 
     private void initContact(int id) {
         ContactDataSource ds = new ContactDataSource(ContactListActivity.this);
@@ -137,6 +282,14 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
         editCell.setText(currentContact.getCellNumber());
         editEmail.setText(currentContact.getEMail());
         birthDay.setText(DateFormat.format("MM/dd/yyyy", currentContact.getBirthday().getTimeInMillis()).toString());
+        ImageButton picture = (ImageButton) findViewById(R.id.imageContact);
+        if (currentContact.getPicture() != null) {
+            picture.setImageBitmap(currentContact.getPicture());
+        }
+        else {
+            picture.setImageResource(R.drawable.ic_launcher_background);
+        }
+
     }
 
 
@@ -236,6 +389,9 @@ public class ContactListActivity extends AppCompatActivity implements DatePicker
         EditText editTextEmail = findViewById(R.id.editTextEmail);
         Button buttonChange = findViewById(R.id.buttonChange);
         Button buttonSave = findViewById(R.id.buttonSave);
+        ImageButton picture = findViewById(R.id.imageContact);
+
+        picture.setEnabled(enabled);
 
         editTextHomePhone.setEnabled(isChecked);
         editTextCellPhone.setEnabled(isChecked);

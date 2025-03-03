@@ -3,6 +3,10 @@ package com.example.contactlist4;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -43,6 +47,13 @@ public class ContactMapActivity extends AppCompatActivity implements OnMapReadyC
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
+    SensorManager sensorManager;
+
+    Sensor accelerometer;
+
+    Sensor magnetometer;
+
+    TextView textDirection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +66,20 @@ public class ContactMapActivity extends AppCompatActivity implements OnMapReadyC
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        if (accelerometer != null && magnetometer != null) {
+            sensorManager.registerListener(mySensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+            sensorManager.registerListener(mySensorEventListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
+
+        } else {
+            Toast.makeText(this, "Sensors not found", Toast.LENGTH_LONG).show();
+        }
+
+        textDirection = (TextView) findViewById(R.id.textHeading);
+
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -73,6 +98,53 @@ public class ContactMapActivity extends AppCompatActivity implements OnMapReadyC
         settingsButton();
 //        initGetLocationButton();
     }
+
+    private SensorEventListener mySensorEventListener = new SensorEventListener() {
+        public void onAccuracyChanged(Sensor sensor, int accuracy) { }
+
+        float[] accelerometerValues;
+        float[] magneticValues;
+
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                accelerometerValues = event.values;
+            }
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                magneticValues = event.values;
+            }
+            if (accelerometerValues != null && magneticValues != null) {
+                float R[] = new float[9];
+                float I[] = new float[9];
+
+                boolean success = SensorManager.getRotationMatrix(R, I, accelerometerValues, magneticValues);
+
+                if (success) {
+                    float orientation[] = new float[3];
+                    SensorManager.getOrientation(R, orientation);
+
+                    float azimut = (float) Math.toDegrees(orientation[0]);
+
+                    if (azimut < 0.0f) {
+                        azimut += 360.0f;
+                    }
+
+                    String direction;
+                    if (azimut >= 315 || azimut < 45) {
+                        direction = "N";
+                    } else if (azimut >= 225 && azimut < 315) {
+                        direction = "W";
+                    } else if (azimut >= 135 && azimut < 225) {
+                        direction = "S";
+                    } else {
+                        direction = "E";
+                    }
+
+                    textDirection.setText(direction);
+                }
+            }
+        }
+    };
+
 
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
